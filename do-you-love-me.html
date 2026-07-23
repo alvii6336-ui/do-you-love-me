@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Question...</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ffe6e6;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+            max-width: 80%;
+        }
+        h1 {
+            color: #ff4d4d;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        #counter {
+            color: #999;
+            font-size: 1em;
+            margin-bottom: 25px;
+            min-height: 1.2em;
+            font-style: italic;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+        }
+        button {
+            padding: 15px 35px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.1s ease, left 0.25s ease, top 0.25s ease, padding 0.2s ease, font-size 0.2s ease, opacity 0.2s ease;
+        }
+        #yesBtn {
+            background-color: #ff4d4d;
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 77, 77, 0.4);
+            transition: transform 0.1s ease, padding 0.3s ease, font-size 0.3s ease;
+        }
+        #yesBtn:hover {
+            background-color: #ff3333;
+        }
+        #noBtn {
+            background-color: #e0e0e0;
+            color: #333;
+            position: relative;
+        }
+        /* Success screen styling */
+        #success-message {
+            display: none;
+            color: #ff4d4d;
+        }
+        #caught-message {
+            display: none;
+            color: #ff4d4d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="main-container">
+        <h1>Do you love me? 🥺👉👈</h1>
+        <div id="counter"></div>
+        <div class="buttons">
+            <button id="yesBtn" onclick="sayYes()">Yes ❤️</button>
+            <button id="noBtn" onmouseover="moveButton()" ontouchstart="moveButton(event)" onclick="caughtMe()">No 💔</button>
+        </div>
+    </div>
+    <div class="container" id="success-message">
+        <h1>I knew it! YAYYY! ❤️🎉</h1>
+        <p style="font-size: 1.5em; color: #555;">Best decision you've made today!</p>
+    </div>
+    <div class="container" id="caught-message">
+        <h1>Wait, you actually caught it?! 😳</h1>
+        <p style="font-size: 1.3em; color: #555;">Fine... but the "Yes" button was right there the whole time.</p>
+        <button id="yesBtn" style="margin-top:15px;" onclick="sayYes()">Okay fine, Yes ❤️</button>
+    </div>
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const counterEl = document.getElementById('counter');
+        const yesBtn = document.getElementById('yesBtn');
+
+        let attempts = 0;
+        let minSize = 0.55; // smallest scale relative to original font-size (em)
+        const baseFontEm = 1.2;
+        const basePadV = 15;
+        const basePadH = 35;
+
+        const teasingLines = [
+            "Nice try. 😏",
+            "Almost had it!",
+            "Nope, too slow!",
+            "It's getting shy...",
+            "So close, yet so far.",
+            "Keep chasing! 🏃",
+            "It doesn't want to be clicked.",
+            "Persistent, huh?"
+        ];
+
+        function randomTease() {
+            return teasingLines[Math.floor(Math.random() * teasingLines.length)];
+        }
+
+        function moveButton(e) {
+            if (e) e.preventDefault();
+
+            attempts++;
+
+            // Occasionally let it get "caught" after enough attempts (rare, escalating chance)
+            const catchChance = Math.min(0.05 + attempts * 0.015, 0.35);
+            if (attempts > 3 && Math.random() < catchChance) {
+                // Don't move it this time — let the click/hover land
+                counterEl.textContent = "Wait... it's not moving?!";
+                return;
+            }
+
+            noBtn.style.position = 'fixed';
+
+            // Shrink slightly each time, down to a minimum size
+            const shrinkFactor = Math.max(minSize, 1 - attempts * 0.04);
+            noBtn.style.fontSize = (baseFontEm * shrinkFactor) + 'em';
+            noBtn.style.padding = (basePadV * shrinkFactor) + 'px ' + (basePadH * shrinkFactor) + 'px';
+
+            const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+            const randomX = Math.floor(Math.random() * Math.max(maxX, 0));
+            const randomY = Math.floor(Math.random() * Math.max(maxY, 0));
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+
+            counterEl.textContent = `Attempts to say no: ${attempts}  —  ${randomTease()}`;
+        }
+
+        function caughtMe() {
+            // Only fires if the button didn't move away in time (the rare "let it get caught" case)
+            document.getElementById('main-container').style.display = 'none';
+            document.getElementById('caught-message').style.display = 'block';
+        }
+
+        function sayYes() {
+            document.getElementById('main-container').style.display = 'none';
+            document.getElementById('caught-message').style.display = 'none';
+            document.getElementById('success-message').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
